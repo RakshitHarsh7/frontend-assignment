@@ -1,52 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const Inbox = () => {
-  const [emails, setEmails] = useState([]);
   const [selectedEmail, setSelectedEmail] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchEmails = async () => {
-      const token = localStorage.getItem('jwt_token');
-      if (!token) {
-        setError('No token found, please log in first');
-        setLoading(false);
-        return;
-      }
-
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        redirect: 'follow'
-      };
-
-      try {
-        const response = await fetch("https://hiring.reachinbox.xyz/api/v1/onebox/list", requestOptions);
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status} - ${response.statusText}`);
-        }
-        const result = await response.json();
-        setEmails(result.data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmails();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  const emails = [
+    {
+      id: 1,
+      sender: 'Orlando',
+      subject: 'New Product Launch',
+      content: 'Hi {FIRST_NAME},\nI would like to introduce you to SaaSgrow, a productized design service specifically tailored for SaaS startups...',
+      date: '20 June 2022, 9:16 AM'
+    },
+    // Add more email objects here
+  ];
 
   return (
     <div className="flex-1 bg-black text-white p-4 flex">
@@ -54,7 +20,7 @@ const Inbox = () => {
         <h2 className="text-xl font-bold mb-4">All Inboxes</h2>
         {emails.map(email => (
           <div key={email.id} className="bg-gray-800 p-4 rounded-lg mb-2 cursor-pointer" onClick={() => setSelectedEmail(email)}>
-            <h3 className="text-lg font-bold">{email.fromName}</h3>
+            <h3 className="text-lg font-bold">{email.sender}</h3>
             <p className="text-gray-400">{email.subject}</p>
           </div>
         ))}
@@ -64,13 +30,13 @@ const Inbox = () => {
           <>
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h2 className="text-xl font-bold">{selectedEmail.fromName}</h2>
+                <h2 className="text-xl font-bold">{selectedEmail.sender}</h2>
                 <p className="text-gray-400">{selectedEmail.subject}</p>
               </div>
-              <div className="text-gray-400">{new Date(selectedEmail.sentAt).toLocaleString()}</div>
+              <div className="text-gray-400">{selectedEmail.date}</div>
             </div>
             <div className="bg-gray-800 p-4 rounded-lg">
-              <div dangerouslySetInnerHTML={{ __html: selectedEmail.body }} />
+              <p>{selectedEmail.content}</p>
             </div>
           </>
         ) : (
@@ -81,9 +47,8 @@ const Inbox = () => {
         {selectedEmail && (
           <>
             <h2 className="text-xl font-bold mb-4">Lead Details</h2>
-            <p>Name: {selectedEmail.fromName}</p>
-            <p>Email: {selectedEmail.fromEmail}</p>
-            <p>To: {selectedEmail.toEmail}</p>
+            <p>Name: {selectedEmail.sender}</p>
+            <p>Email: orlando@gmail.com</p>
             <p>Contact No: +54-9062827869</p>
             <p>LinkedIn: linkedin.com/in/timvadde/</p>
             <p>Company: Reachinbox</p>
